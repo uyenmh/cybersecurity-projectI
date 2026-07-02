@@ -23,9 +23,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-!==b8!(3k)yilkk94qf(*g#$$@8cj&aw6q%1ck_n7iyd7c1ds#"
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# Flaw 3: A05:2021 – Security Misconfiguration
+# DEBUG being set to True allows for detailed error messages to be displayed in the browser,
+# which can reveal sensitive information about the application.
+# ALLOWED_HOSTS is also not properly configured.
 DEBUG = True
-
 ALLOWED_HOSTS = []
+
+# Fix for flaw 3:
+# In production, DEBUG should be set to False and ALLOWED_HOSTS should be configured
+# to include the deployment domain.
+# DEBUG = False
+# ALLOWED_HOSTS = ["localhost", "127.0.0.1", "appdomain.com"]
 
 
 # Application definition
@@ -37,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "journals",
 ]
 
 MIDDLEWARE = [
@@ -83,20 +93,28 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-]
+
+# Flaw 4: A07:2021 – Identification and Authentication Failures
+# There are no password validators, which allows users to set weak passwords.
+AUTH_PASSWORD_VALIDATORS = []
+
+# Fix for flaw 4:
+# Password validators enforce rules such as minimum length and non-common strings,
+# which improves password security.
+# AUTH_PASSWORD_VALIDATORS = [
+#     {
+#         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+#     },
+#     {
+#         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+#     },
+#     {
+#         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+#     },
+#     {
+#         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+#     },
+# ]
 
 
 # Internationalization
@@ -104,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Helsinki"
 
 USE_I18N = True
 
@@ -115,3 +133,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "index"
+
+# Flaw 5: A02:2021 – Cryptographic Failures
+# HTTPS connections are not enforced, which allows for the interception of sensitive information.
+# Session and CSRF cookies are also not protected, increasing the risk of session hijacking and CSRF attacks.
+
+# Fix for flaw 5:
+# Enforce HTTPS connections and secure cookies to prevent interception of sensitive information
+# and reduce the risk of session hijacking and CSRF attacks.
+# SECURE_HSTS_SECONDS = 15768000
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True

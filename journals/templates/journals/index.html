@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>My journal</title>
+    </head>
+
+    <body>
+        Logged in as {{ user.username }}
+        <form action="{% url 'logout' %}" method="POST" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+        </form>
+
+
+        <h1>My journal</h1>
+
+        <h2>Add new journal entry</h2>
+        <form action="{% url 'add_entry' %}" method="POST">
+            {% csrf_token %}
+            <textarea name="content" rows="5"></textarea>
+            <p> <button type="submit">Publish</button> </p>
+        </form>
+
+
+        <h2>My entries</h2>
+
+        <form action="{% url 'index' %}" method="GET">
+            <input type ="text" name="query" value="{{ query|default:''}}" placeholder="Search entries"/>
+            <button type="submit">Search</button>
+        </form>
+
+        <ul>
+        {% for entry in entries %}
+            <li>
+                <p> {{ entry.content }} </p>
+                <p> {{ entry.created_at|date:"d/m/y, h:i A" }} </p>
+                <form action="{% url 'delete_entry' entry.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+        </ul>
+
+
+        <h2>Delete all entries</h2>
+        <form action="{% url 'delete_all_entries' %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="Delete all"/>
+        </form>
+    </body>
+</html>
