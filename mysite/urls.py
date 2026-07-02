@@ -17,6 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic.base import RedirectView
 from django.urls import path, include
 
 urlpatterns = [
@@ -24,4 +25,5 @@ urlpatterns = [
     path("journals/", include("journals.urls")),
     path("login/", LoginView.as_view(template_name="journals/login.html"), name="login"),
     path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
+    path("", RedirectView.as_view(url="journals/"), name="go-to-index"),
 ]
