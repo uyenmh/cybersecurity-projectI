@@ -11,22 +11,22 @@ from .models import Entry
 @login_required
 def index(request):
     # Flaw 1: A01:2021 – Broken Access Control
-    # Any logged in user can view another user's journal entries
-    # by changing the "user" parameter in the URL.
+    # Username is fetched from the "user" parameter in the URL, so any logged in user
+    # can view another user's journal entries by editing the "user" parameter in the URL.
     # For example: http://127.0.0.1:8000/journals/?user=anotheruser
     username = request.GET.get("user", request.user.username)
     user = User.objects.get(username=username)
 
     # Fix for flaw 1:
-    # Use the authenticated user instead of getting the "user" parameter from the URL.
+    # Fetch the user from the authenticated session instead.
     # user = request.user
 
     entries = Entry.objects.filter(owner=user)
     query = request.GET.get("query")
 
     # Flaw 2: A03:2021 – Injection
-    # Entering ' OR 1=1-- in the search bar returns entries from all users
-    # instead of only the entries of the logged in user.
+    # The raw SQL query is vulnerable to SQL injection. For example, entering ' OR 1=1-- in the
+    # search bar returns entries from all users instead of only the entries of the logged in user.
     if query:
         sql = f"""
             SELECT id, content, created_at
@@ -40,7 +40,7 @@ def index(request):
             entries = [{"id": row[0], "content": row[1], "created_at": row[2]} for row in rows]
 
     # Fix for flaw 2:
-    # Use Django's ORM to filter the entries instead of raw SQL queries.
+    # Use Django's ORM "icontains" to filter the entries instead.
     # if query:
     #     entries = entries.filter(content__icontains=query)
 
