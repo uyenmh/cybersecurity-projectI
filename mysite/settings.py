@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-!==b8!(3k)yilkk94qf(*g#$$@8cj&aw6q%1ck_n7iyd7c1ds#
 
 # Flaw 3: A05:2021 – Security Misconfiguration
 # DEBUG being set to True allows for detailed error messages to be displayed in the browser
-# when an unhandled error occurs, which can reveal sensitive information about the application.
+# when unhandled errors occur, which can reveal sensitive information about the application.
 DEBUG = True
 ALLOWED_HOSTS = []
 
